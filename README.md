@@ -48,7 +48,7 @@ This project demonstrates real-world mobile engineering skills including:
 | Platform       | Access                                       |
 | -------------- | -------------------------------------------- |
 | 📱 Android APK | [Download APK]() |
-| 🌐 Backend API | https://your-backend-url.onrender.com        |
+| 🌐 Backend API | https://zynetra.onrender.com       |
 
 > **Note:** Zynetra is a native mobile application built with React Native and Expo.
 > Install the Android APK on your device to experience the full application.
