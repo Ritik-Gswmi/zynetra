@@ -9,6 +9,15 @@ dist/
 web-build/
 expo-env.d.ts
 
+# Local env files (never commit)
+.env
+frontend/.env
+backend/.env
+.env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
 # Native
 .kotlin/
 *.orig.*
@@ -30,12 +39,20 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
-
 # typescript
 *.tsbuildinfo
+
+# caches / tooling
+.npm-cache/
+.eslintcache
+.cache/
+coverage/
 
 # generated native folders
 /ios
 /android
+frontend/ios/
+frontend/android/
+
+# backend
+backend/dist
