@@ -49,12 +49,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hydrate: async () => {
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
-      if (!raw) return set({ status: 'guest' });
+      if (!raw) {
+        set({ status: 'guest' });
+        // Ensure dependent stores hydrate against the correct userKey (guest vs authed).
+        void useWishlistStore.getState().hydrate();
+        return;
+      }
       const parsed = JSON.parse(raw) as { token?: string; user?: User };
       if (parsed.token && parsed.user) set({ status: 'authenticated', token: parsed.token, user: parsed.user });
       else set({ status: 'guest' });
+      // Wishlist is stored per-user; bootstrap hydrates in parallel so it can hydrate as guest first.
+      void useWishlistStore.getState().hydrate();
     } catch {
       set({ status: 'guest' });
+      void useWishlistStore.getState().hydrate();
     }
   },
 
