@@ -1,5 +1,4 @@
 import React from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
@@ -34,23 +33,9 @@ export function Root() {
   const minSplashMs = 3000;
   const elapsed = Date.now() - splashStartMs;
   const remaining = Math.max(0, minSplashMs - elapsed);
-  const t = setTimeout(() => setShowSplash(false), remaining);
+ const t = setTimeout(() => setShowSplash(false), remaining);
   return () => clearTimeout(t);
  }, [ready, splashStartMs]);
-
-  React.useEffect(() => {
-    // Guests should see the Welcome screen every time they open/resume the app
-    // until they authenticate (login/signup).
-    let prevState: AppStateStatus = AppState.currentState;
-    const sub = AppState.addEventListener('change', (nextState) => {
-      const becameActive = (prevState === 'inactive' || prevState === 'background') && nextState === 'active';
-      prevState = nextState;
-      if (!becameActive) return;
-      if (useAuthStore.getState().status !== 'guest') return;
-      safeResetToHome();
-    });
-    return () => sub.remove();
-  }, []);
 
   const handleNavigationReady = React.useCallback(() => {
     onNavigationReady();
