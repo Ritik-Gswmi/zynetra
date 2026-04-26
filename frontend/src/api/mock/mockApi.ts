@@ -1,7 +1,7 @@
 import type { Api } from '../api';
 import type { AuthResponse, Course, Lesson, ProgressSummary, User } from '../types';
 import { courses, lessonsByCourseId } from './mockData';
-import { ensureUserProgress, loadDb, saveDb } from './mockDb';
+import { ensureUserProgress, ensureUserWishlist, loadDb, saveDb } from './mockDb';
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -27,6 +27,7 @@ async function authResponse(user: { id: string; name: string; email: string }): 
   const db = await loadDb();
   db.tokens[token] = user.id;
   ensureUserProgress(db, user.id);
+  ensureUserWishlist(db, user.id);
   await saveDb(db);
   return { token, user };
 }
@@ -146,5 +147,23 @@ export const api: Api = {
         lastQuizScoreByLessonId: progress.lastQuizScoreByLessonId,
       })),
     };
+  },
+
+  getWishlist: async ({ token }) => {
+    await sleep(150);
+    const userId = await requireUserId(token);
+    const db = await loadDb();
+    const ids = ensureUserWishlist(db, userId);
+    return { courseIds: Array.isArray(ids) ? ids : [] };
+  },
+
+  setWishlist: async ({ token, courseIds }) => {
+    await sleep(150);
+    const userId = await requireUserId(token);
+    const db = await loadDb();
+    const next = Array.isArray(courseIds) ? courseIds.filter((x) => typeof x === 'string') : [];
+    db.wishlistByUserId[userId] = next;
+    await saveDb(db);
+    return { courseIds: next };
   },
 };

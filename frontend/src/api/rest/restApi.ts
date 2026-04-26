@@ -75,4 +75,7 @@ export const api: Api = {
       body: JSON.stringify({ answers }),
     }),
   getProgress: ({ token }) => request<ProgressSummary>('/progress', { token }),
+  getWishlist: ({ token }) => request<{ courseIds: string[] }>('/wishlist', { token }),
+  setWishlist: ({ token, courseIds }) =>
+    request<{ courseIds: string[] }>('/wishlist', { method: 'PUT', token, body: JSON.stringify({ courseIds }) }),
 };

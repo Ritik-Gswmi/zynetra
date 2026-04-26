@@ -12,12 +12,13 @@ type MockDb = {
   users: MockUser[];
   tokens: TokenMap;
   progressByUserId: Record<string, UserProgress>;
+  wishlistByUserId: Record<string, string[]>;
 };
 
 const DB_KEY = 'mockdb.v1';
 
 function defaultDb(): MockDb {
-  return { users: [], tokens: {}, progressByUserId: {} };
+  return { users: [], tokens: {}, progressByUserId: {}, wishlistByUserId: {} };
 }
 
 export async function loadDb(): Promise<MockDb> {
@@ -43,3 +44,7 @@ export function ensureUserProgress(db: MockDb, userId: string): UserProgress {
   return db.progressByUserId[userId]!;
 }
 
+export function ensureUserWishlist(db: MockDb, userId: string): string[] {
+  db.wishlistByUserId[userId] ??= [];
+  return db.wishlistByUserId[userId]!;
+}

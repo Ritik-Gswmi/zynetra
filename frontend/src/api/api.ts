@@ -15,6 +15,8 @@ export type Api = {
   markLessonComplete: (params: { token: string; courseId: string; lessonId: string }) => Promise<void>;
   submitQuiz: (params: { token: string; courseId: string; lessonId: string; answers: number[] }) => Promise<number>;
   getProgress: (params: { token: string }) => Promise<ProgressSummary>;
+  getWishlist: (params: { token: string }) => Promise<{ courseIds: string[] }>;
+  setWishlist: (params: { token: string; courseIds: string[] }) => Promise<{ courseIds: string[] }>;
 };
 
 export const api: Api = API_BASE_URL ? rest.api : mock.api;

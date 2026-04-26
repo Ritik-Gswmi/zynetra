@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 
+import { api } from '../api/api';
 import { useAuthStore } from './authStore';
 
 type WishlistState = {
@@ -58,6 +59,56 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
   courseIds: [],
 
   hydrate: async () => {
+    const auth = useAuthStore.getState();
+    // For authenticated users, wishlist should persist across reinstalls/builds,
+    // so we source truth from the backend (with local fallback if offline).
+    if (auth.status === 'authenticated' && auth.token) {
+      const userKey = currentUserKey();
+      const localIds = await (async () => {
+        try {
+          const raw = await AsyncStorage.getItem(STORAGE_KEY);
+          return readIdsForUser(raw, userKey).ids;
+        } catch {
+          return [];
+        }
+      })();
+
+      try {
+        const res = await api.getWishlist({ token: auth.token });
+        const remoteIds = normalizeIds(res?.courseIds);
+        const merged = Array.from(new Set([...remoteIds, ...localIds]));
+        set({ courseIds: merged });
+
+        // If local has data but server doesn't (common on first upgrade),
+        // push the merged list so it survives reinstall.
+        if (merged.length !== remoteIds.length) {
+          try {
+            await api.setWishlist({ token: auth.token, courseIds: merged });
+          } catch {
+            // Ignore.
+          }
+        }
+
+        // Keep a local cache as a best-effort fallback.
+        try {
+          const raw = await AsyncStorage.getItem(STORAGE_KEY);
+          const { nextRaw } = readIdsForUser(raw, userKey);
+          const base = nextRaw ?? raw;
+          const parsed = base ? (JSON.parse(base) as StoredWishlistV3) : ({} as StoredWishlistV3);
+          const byUserKey: Record<string, string[]> = {};
+          if (parsed.byUserKey && typeof parsed.byUserKey === 'object') {
+            for (const [k, v] of Object.entries(parsed.byUserKey)) byUserKey[k] = normalizeIds(v);
+          }
+          byUserKey[userKey] = merged;
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify({ byUserKey } satisfies StoredWishlistV3));
+        } catch {
+          // Ignore.
+        }
+        return;
+      } catch {
+        // Fall back to local cache below.
+      }
+    }
     try {
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
       const userKey = currentUserKey();
@@ -75,6 +126,16 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
     const current = get().courseIds;
     const next = current.includes(courseId) ? current.filter((id) => id !== courseId) : [...current, courseId];
     set({ courseIds: next });
+
+    const auth = useAuthStore.getState();
+    if (auth.status === 'authenticated' && auth.token) {
+      try {
+        await api.setWishlist({ token: auth.token, courseIds: next });
+      } catch {
+        // Ignore (local cache below keeps UI stable; will resync on next successful hydrate/toggle).
+      }
+    }
+
     try {
       const userKey = currentUserKey();
       const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -94,6 +155,16 @@ export const useWishlistStore = create<WishlistState>((set, get) => ({
 
   clear: async () => {
     set({ courseIds: [] });
+
+    const auth = useAuthStore.getState();
+    if (auth.status === 'authenticated' && auth.token) {
+      try {
+        await api.setWishlist({ token: auth.token, courseIds: [] });
+      } catch {
+        // Ignore.
+      }
+    }
+
     try {
       const userKey = currentUserKey();
       const raw = await AsyncStorage.getItem(STORAGE_KEY);

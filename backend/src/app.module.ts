@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CoursesModule } from './modules/courses/courses.module';
 import { ProgressModule } from './modules/progress/progress.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -21,6 +22,7 @@ import { AppController } from './app.controller';
     UsersModule,
     CoursesModule,
     ProgressModule,
+    WishlistModule,
   ],
   controllers: [AppController],
 })
