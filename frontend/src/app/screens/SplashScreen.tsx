@@ -10,7 +10,7 @@ export function SplashScreen() {
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
 
-  const logoSize = Math.min(260, Math.round(Math.min(width, height) * 0.46));
+  const logoSize = Math.min(1500, Math.round(Math.min(width, height) * 2.00));
 
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>

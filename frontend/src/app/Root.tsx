@@ -1,4 +1,5 @@
 import React from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
@@ -6,8 +7,9 @@ import { StatusBar } from 'expo-status-bar';
 
 import { RootNavigator } from './navigation/RootNavigator';
 import { linking } from '../lib/linking';
-import { navigationRef, onNavigationReady } from './navigation/navigationRef';
+import { navigationRef, onNavigationReady, safeResetToHome } from './navigation/navigationRef';
 import { useBootstrap } from './bootstrap/useBootstrap';
+import { useAuthStore } from '../store/authStore';
 import { useThemeStore } from '../store/themeStore';
 import { colors } from '../ui/theme/colors';
 import { SplashScreen } from './screens/SplashScreen';
@@ -36,6 +38,28 @@ export function Root() {
   return () => clearTimeout(t);
  }, [ready, splashStartMs]);
 
+  React.useEffect(() => {
+    // Guests should see the Welcome screen every time they open/resume the app
+    // until they authenticate (login/signup).
+    let prevState: AppStateStatus = AppState.currentState;
+    const sub = AppState.addEventListener('change', (nextState) => {
+      const becameActive = (prevState === 'inactive' || prevState === 'background') && nextState === 'active';
+      prevState = nextState;
+      if (!becameActive) return;
+      if (useAuthStore.getState().status !== 'guest') return;
+      safeResetToHome();
+    });
+    return () => sub.remove();
+  }, []);
+
+  const handleNavigationReady = React.useCallback(() => {
+    onNavigationReady();
+
+    // Cold start: if we are a guest (no login/signup), always land on Welcome
+    // even if linking/initial nav state would otherwise open Tabs.
+    if (useAuthStore.getState().status === 'guest') safeResetToHome();
+  }, []);
+
 
   if (!ready || showSplash)
     return (
@@ -51,7 +75,7 @@ export function Root() {
         <NavigationContainer
           ref={navigationRef}
           linking={linking}
-          onReady={onNavigationReady}
+          onReady={handleNavigationReady}
           theme={{
             ...DefaultTheme,
             dark: useThemeStore.getState().mode === 'dark',

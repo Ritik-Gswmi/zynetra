@@ -1,7 +1,7 @@
 # 🚀 Zynetra — Micro-Learning Mobile App
 
 <p align="center">
-  <img src="./frontend/assets/app-logo.png" alt="Zynetra Logo" width="120" />
+  <img src="./frontend/assets/app-icon.png" alt="Zynetra Logo" width="120" />
 </p>
 
 <p align="center">

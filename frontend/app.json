@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "scheme": "aimicro",
     "orientation": "portrait",
-    "icon": "./assets/app-logo.png",
+    "icon": "./assets/app-icon.png",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
@@ -22,7 +22,7 @@
       "package": "com.zynetra.app",
       "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/app-logo.png",
+        "foregroundImage": "./assets/app-icon.png",
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
@@ -34,6 +34,11 @@
     ],
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "621f64da-e943-4cfa-b9e9-3679141dff5a"
+      }
     }
   }
 }
