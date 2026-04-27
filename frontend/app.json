@@ -6,7 +6,7 @@
     "scheme": "aimicro",
     "orientation": "portrait",
     "icon": "./assets/app-icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/app-logo.png",
@@ -28,6 +28,9 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
+    "androidNavigationBar": {
+      "enforceContrast": false
+    },
     "plugins": [
       "expo-notifications",
       "expo-video"
@@ -35,9 +38,10 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "owner": "ritik699",
     "extra": {
       "eas": {
-        "projectId": "621f64da-e943-4cfa-b9e9-3679141dff5a"
+        "projectId": "d19d98fc-bfd2-43f2-9cfc-aeb85835f224"
       }
     }
   }

@@ -1,7 +1,9 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
 
 import { RootNavigator } from './navigation/RootNavigator';
@@ -28,9 +30,16 @@ export function Root() {
   const [showSplash, setShowSplash] = React.useState(true);
   const splashStartMs = React.useRef(Date.now()).current;
 
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') return;
+
+    // Keep the system navigation bar (bottom) consistent with the app theme.
+    void NavigationBar.setButtonStyleAsync(mode === 'dark' ? 'light' : 'dark');
+  }, [mode]);
+
  React.useEffect(() => {
   if (!ready) return;
-  const minSplashMs = 3000;
+  const minSplashMs = 4000;
   const elapsed = Date.now() - splashStartMs;
   const remaining = Math.max(0, minSplashMs - elapsed);
  const t = setTimeout(() => setShowSplash(false), remaining);
