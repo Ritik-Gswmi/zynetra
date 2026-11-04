@@ -13,15 +13,8 @@ export function SplashScreen() {
 
   React.useEffect(() => {
     const base = API_BASE_URL.replace(/\/+$/, '');
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45_000);
-
-    void fetch(`${base}/`, { method: 'GET', signal: controller.signal }).catch(() => {});
-
-    return () => {
-      clearTimeout(timeout);
-      controller.abort();
-    };
+  
+    void fetch(`${base}/`, { method: 'GET' }).catch(() => {});
   }, []);
 
   const logoSize = Math.min(1500, Math.round(Math.min(width, height) * 2.00));
