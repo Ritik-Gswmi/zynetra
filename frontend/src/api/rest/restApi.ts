@@ -68,12 +68,14 @@ export const api: Api = {
   enroll: ({ token, courseId }) => request<void>(`/courses/${courseId}/enroll`, { method: 'POST', token }),
   markLessonComplete: ({ token, courseId, lessonId }) =>
     request<void>(`/courses/${courseId}/lessons/${lessonId}/complete`, { method: 'POST', token }),
-  submitQuiz: ({ token, courseId, lessonId, answers }) =>
-    request<number>(`/courses/${courseId}/lessons/${lessonId}/quiz/submit`, {
+  submitQuiz: async ({ token, courseId, lessonId, answers }) => {
+    const result = await request<{ score: number }>(`/courses/${courseId}/lessons/${lessonId}/quiz/submit`, {
       method: 'POST',
       token,
       body: JSON.stringify({ answers }),
-    }),
+    });
+    return result.score;
+  },
   getProgress: ({ token }) => request<ProgressSummary>('/progress', { token }),
   getWishlist: ({ token }) => request<{ courseIds: string[] }>('/wishlist', { token }),
   setWishlist: ({ token, courseIds }) =>
